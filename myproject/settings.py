@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -111,8 +112,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('Bearer', 'Token'),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token expiry (e.g., 5 minutes)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Refresh token expiry (e.g., 1 day)
+    'ROTATE_REFRESH_TOKENS': True,  # Automatically rotate refresh tokens
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old refresh token after it's rotated
+    'ALGORITHM': 'HS256',  # The algorithm to use for encoding/decoding the token
+    'SIGNING_KEY': SECRET_KEY,  # The secret key used for signing tokens
 }
 
 CORS_ALLOWED_ORIGINS = [
@@ -129,6 +135,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT authentication
+        'rest_framework.authentication.TokenAuthentication',  # Token authentication
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',  # Requires authentication

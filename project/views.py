@@ -1,13 +1,16 @@
 import logging
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Project
 from project_records.models import ProjectRecord
 from .serializers import ProjectSerializer
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger(__name__)
-
 
 @api_view(['POST'])
 def create_project(request):
@@ -67,7 +70,10 @@ def create_project(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])  # Make sure JWT authentication is applied
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
 def view_all_projects(request):
     try:
         # Retrieve all projects

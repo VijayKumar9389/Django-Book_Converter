@@ -36,7 +36,6 @@ class LoginView(APIView):
         logger.error(f"Login failed: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -56,13 +55,13 @@ class RefreshTokenView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # Look for the refresh token in the Authorization header
-        auth_header = request.headers.get("Authorization")
-        if not auth_header or not auth_header.startswith("Bearer "):
-            logger.error("No refresh token provided or malformed Authorization header")
-            return Response({"error": "No refresh token provided"}, status=status.HTTP_401_UNAUTHORIZED)
+        # Look for the refresh token in the request body
+        refresh_token = request.data.get("refresh")
 
-        refresh_token = auth_header.split(" ")[1]  # Extract the token
+        if not refresh_token:
+            logger.error("No refresh token provided in the request body")
+            return Response({"error": "No refresh token provided"}, status=status.HTTP_400_BAD_REQUEST)
+
         logger.info(f"Received refresh token: {refresh_token}")
 
         try:
